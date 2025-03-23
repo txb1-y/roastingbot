@@ -1,34 +1,50 @@
 const API_KEY = "AIzaSyAi4ZmiAAcr7HgwvINOrS7N9p6QyhWKlF4";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-let chatHistory = []; // Stores past messages for context
+let chatHistory = []; // Bot forgets history after every session
+
+// Hardcoded savage roasts (fallback if API fails)
+const ROAST_NUKES = [
+    "Dei, un face ah paatha pothum, even Google Maps can't find your glow-up location! 😂",
+    "Un voice ipdi irruku... Discord mod ah illa local theru porukki ah? 💀🔥",
+    "Nee vantha matum patha podhum, network signalum low aagiduchu da. 😵‍💫📉",
+    "Dei, nee dress panradhu fashion nu nenachiya? Theru market-la irunthu vaanguna modhalali! 🛒🫠",
+    "Un profile pic ku mela yaaravathu prayer poda vendiyadhu da... 🙏🕊️"
+];
 
 async function getRoast() {
-    let userText = document.getElementById("userInput").value;
+    let userText = document.getElementById("userInput").value.trim();
     let chatbox = document.getElementById("chatbox");
 
-    if (userText.trim() === "") {
+    if (userText === "") {
         alert("Type something first to get roasted! 😈");
         return;
     }
 
-    // Add user message to chat
+    // Add user message to chatbox
     addMessage("user", userText);
-
     document.getElementById("userInput").value = ""; // Clear input
-
-    // Push user message to history
-    chatHistory.push({ role: "user", text: userText });
 
     const payload = {
         contents: [{
             parts: [{
-                text: `You are a savage, sarcastic, and humorous Thanglish roaster. 
-                      Roast the user BRUTALLY based on: "${userText}"  
-                      and reference previous conversations for continuity: ${JSON.stringify(chatHistory)}  
-                      **Make it extremely witty, short, and hurtful.**  
-                      **Use strong Thanglish slang, savage humor, and emojis.**  
-                      **Make it feel like a natural roast, not robotic.**`
+                text: `You are a THERMONUCLEAR Thanglish roaster. Rules:
+
+1. ANALYZE "${userText}" for WEAKNESS & ROAST HARD
+2. USE viral Instagram teen slang + Tamil comedy phrases
+3. RESPONSE MUST INCLUDE:
+   - MINIMUM 3 TAMIL BAD WORDS (Romanized)  
+   - Trendy words like "vecha scene", "oru flow illa", "local gaana vibe", etc.
+   - Comparison to EMBARRASSING things (garbage, animals, etc.)
+   - At least 3 EMOJIS 🤡🔥
+4. ESCALATE ROAST by 10% MORE for every reply!  
+5. FORMAT: SHORT, SAVAGE, NO MERCY 🔥
+
+EXAMPLE:
+"AYYO! Nee enna profile pic vachuruka?  
+Paathavudane Instagram itself asked to logout! 🤡💀  
+Oru flow illa da unuku, even bus ticket kuda reject pannum. 🚶🔥"
+`
             }]
         }]
     };
@@ -47,14 +63,13 @@ async function getRoast() {
 
         let roastText = data.candidates?.[0]?.content?.parts?.[0]?.text || "AI didn't respond.";
 
-        // Push bot reply to history
-        chatHistory.push({ role: "bot", text: roastText });
-
-        // Add bot reply to chat
+        // Add bot reply to chatbox
         addMessage("bot", roastText);
 
     } catch (error) {
-        addMessage("bot", `Error: ${error.message}`);
+        // If API fails, use a hardcoded roast
+        let roastFallback = ROAST_NUKES[Math.floor(Math.random() * ROAST_NUKES.length)];
+        addMessage("bot", roastFallback);
         console.error("API Error:", error);
     }
 }
